@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Warehouse Dashboard - Picking Productivity</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --sidebar-bg: #0b1329;
+  --sidebar-hover: #162244;
+  --sidebar-active: #2563eb;
+  --body-bg: #f4f7fb;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-sub: #64748b;
+  --border-color: #e2e8f0;
+  --primary-blue: #2563eb;
+  --success-green: #10b981;
+  --warning-orange: #f59e0b;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --danger-red: #ef4444;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Plus Jakarta Sans', sans-serif;
+  background:var(--body-bg);
+  color:var(--text-main);
+  display:flex;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:var(--sidebar-bg);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  padding:24px 16px;
+  flex-shrink:0;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 12px 24px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.brand-icon{
+  width:38px;
+  height:38px;
+  background:var(--primary-blue);
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+}
+
+.brand-text h2{
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  line-height:1.2;
+}
+
+.brand-text span{
+  font-size:11px;
+  color:#94a3b8;
+}
+
+.nav-menu{
+  margin-top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
+
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:12px 16px;
+  border-radius:10px;
+  color:#94a3b8;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+}
+
+.nav-item:hover{
+  background:var(--sidebar-hover);
+  color:#fff;
+}
+
+.nav-item.active{
+  background:var(--primary-blue);
+  color:#fff;
+  box-shadow:0 4px 14px rgba(37,99,235,0.35);
+}
+
+.nav-item i{
+  font-size:16px;
+  width:20px;
+  text-align:center;
+}
+
+.sidebar-widget{
+  background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:20px 16px;
+  text-align:center;
+  margin-top:auto;
+}
+
+.sidebar-widget-title{
+  font-size:12px;
+  font-weight:700;
+  color:#cbd5e1;
+  margin-bottom:14px;
+}
+
+.circular-gauge{
+  position:relative;
+  width:110px;
+  height:110px;
+  margin:0 auto;
+}
+
+.circular-gauge svg{
+  transform:rotate(-90deg);
+  width:110px;
+  height:110px;
+}
+
+.gauge-bg{
+  fill:none;
+  stroke:rgba(255,255,255,0.1);
+  stroke-width:10;
+}
+
+.gauge-bar{
+  fill:none;
+  stroke:url(#gaugeGradient);
+  stroke-width:10;
+  stroke-linecap:round;
+  stroke-dasharray:283;
+  stroke-dashoffset:70;
+  transition:stroke-dashoffset 0.8s ease;
+}
+
+.gauge-value{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  font-size:22px;
+  font-weight:800;
+  color:#fff;
+}
+
+.gauge-status{
+  font-size:11px;
+  color:#34d399;
+  font-weight:600;
+  margin-top:10px;
+}
+
+/* MAIN CONTENT */
+.main-wrapper{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  height:100vh;
+  overflow-y:auto;
+}
+
+.top-bar{
+  background:#fff;
+  padding:16px 28px;
+  border-bottom:1px solid var(--border-color);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.top-bar-title h1{
+  font-size:20px;
+  font-weight:800;
+  color:var(--text-main);
+}
+
+.top-bar-title p{
+  font-size:12px;
+  color:var(--text-sub);
+  margin-top:2px;
+}
+
+.top-bar-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.filter-badge{
+  background:#f1f5f9;
+  border:1px solid var(--border-color);
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#475569;
+}
+
+.btn-tab{
+  border:0;
+  padding:8px 18px;
+  border-radius:8px;
+  background:#e2e8f0;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+  color:#475569;
+  transition:all 0.2s;
+}
+
+.btn-tab.active{
+  background:var(--primary-blue);
+  color:#fff;
+  box-shadow:0 3px 10px rgba(37,99,235,0.25);
+}
+
+.refresh-badge{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:var(--primary-blue);
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.btn-refresh{
+  background:var(--primary-blue);
+  color:#fff;
+  border:0;
+  padding:8px 14px;
+  border-radius:8px;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition:background 0.2s;
+}
+
+.btn-refresh:hover{
+  background:#1d4ed8;
+}
+
+/* CONTENT CONTAINER */
+.content-area{
+  padding:24px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* TOP KPI CARDS */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:16px;
+}
+
+.kpi-card{
+  background:var(--card-bg);
+  border:2px solid var(--border-color);
+  border-radius:16px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 6px rgba(0,0,0,0.02);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  transition:all 0.25s ease;
+  user-select:none;
+}
+
+.kpi-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.06);
+  border-color:var(--primary-blue);
+}
+
+.kpi-card.selected{
+  border-color:var(--primary-blue);
+  background:#f8faff;
+  box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.click-hint{
+  position:absolute;
+  top:12px;
+  right:14px;
+  font-size:10px;
+  font-weight:700;
+  color:#94a3b8;
+  background:#f1f5f9;
+  padding:2px 6px;
+  border-radius:4px;
+}
+
+.kpi-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.kpi-icon{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  font-size:16px;
+  color:#fff;
+}
+
+.kpi-icon.blue{background:linear-gradient(135deg, #3b82f6, #1d4ed8)}
+.kpi-icon.green{background:linear-gradient(135deg, #10b981, #047857)}
+.kpi-icon.orange{background:linear-gradient(135deg, #f59e0b, #b45309)}
+.kpi-icon.purple{background:linear-gradient(135deg, #8b5cf6, #6d28d9)}
+.kpi-icon.cyan{background:linear-gradient(135deg, #06b6d4, #0e7490)}
+
+.kpi-label{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+.kpi-body{
+  margin-top:14px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+}
+
+.kpi-val{
+  font-size:26px;
+  font-weight:800;
+  color:var(--text-main);
+  letter-spacing:-0.5px;
+}
+
+.kpi-trend{
+  font-size:11px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+
+.kpi-trend.up{color:var(--success-green);}
+.kpi-trend.down{color:var(--danger-red);}
+
+.kpi-sub{
+  font-size:10px;
+  color:#94a3b8;
+  margin-top:2px;
+}
+
+.kpi-sparkline{
+  margin-top:10px;
+  height:26px;
+  width:100%;
+}
+
+.kpi-sparkline path{
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+}
+
+/* ACTIVE FILTER CHIP BAR */
+.active-filter-bar{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  padding:10px 18px;
+  border-radius:10px;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:700;
+  color:#1e40af;
+}
+
+.active-filter-bar.show{
+  display:flex;
+}
+
+.btn-clear-filter{
+  background:#fff;
+  border:1px solid #bfdbfe;
+  color:#1e40af;
+  padding:4px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+/* 2-COLUMN GRID */
+.grid-2col{
+  display:grid;
+  grid-template-columns:1.25fr 1fr;
+  gap:16px;
+}
+
+.grid-equal{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.panel{
+  background:var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.02);
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.panel-title{
+  font-size:15px;
+  font-weight:800;
+  color:var(--text-main);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.panel-badge{
+  font-size:11px;
+  background:#f1f5f9;
+  padding:4px 10px;
+  border-radius:20px;
+  font-weight:700;
+  color:#64748b;
+}
+
+/* AUTO TARGET BADGE */
+.auto-target-badge{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:#f0fdf4;
+  padding:6px 14px;
+  border:1.5px solid #86efac;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  color:#166534;
+}
+
+/* ATTAINMENT TABLE */
+.attainment-table-container{
+  width:100%;
+  border-radius:6px;
+  overflow:hidden;
+  border:1.5px solid #000;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+.attainment-table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:'Plus Jakarta Sans', Arial, sans-serif;
+  font-size:13px;
+  text-align:center;
+}
+
+.attainment-table th, 
+.attainment-table td{
+  border:1.5px solid #000;
+  padding:8px 12px;
+  font-weight:600;
+  color:#000;
+}
+
+.row-overall-night th.cell-overall-title{
+  background-color:#e8d4dc;
+  font-size:14px;
+  font-weight:800;
+}
+
+.row-overall-night td.cell-overall-target{
+  background-color:#d2e5f5;
+  font-weight:800;
+  font-size:14px;
+}
+
+.row-overall-night td.cell-overall-actual{
+  background-color:#dfdff5;
+  font-weight:800;
+  font-size:14px;
+}
+
+.row-overall-night td.cell-overall-attain{
+  font-weight:800;
+  font-size:14px;
+}
+
+.row-subhead th{
+  background-color:#c8dff2;
+  font-weight:800;
+  font-size:13px;
+}
+
+.cell-shift-tag{
+  background-color:#d4e5eb;
+  font-weight:700;
+}
+
+.cell-hour-tag{
+  background-color:#fceec7;
+  font-weight:700;
+}
+
+.cell-target{
+  background-color:#ffffff;
+  font-weight:600;
+}
+
+.cell-actual{
+  background-color:#ffffff;
+  font-weight:700;
+}
+
+.cell-actual.running{
+  background-color:#ecfdf5;
+  color:#065f46;
+}
+
+.cell-attain-high{
+  background-color:#c8e6c9 !important;
+  color:#1b5e20 !important;
+  font-weight:800;
+}
+
+.cell-attain-low{
+  background-color:#f8bbd0 !important;
+  color:#880e4f !important;
+  font-weight:800;
+}
+
+.cell-attain-zero{
+  background-color:#f8bbd0 !important;
+  color:#880e4f !important;
+}
+
+/* LEADERBOARD */
+.rank-item{
+  display:flex;
+  align-items:center;
+  padding:10px 8px;
+  border-bottom:1px solid #f1f5f9;
+  transition:background 0.2s;
+  border-radius:8px;
+}
+
+.rank-item:hover{background:#f8fafc;}
+.rank-item:last-child{border-bottom:0;}
+
+.rank-pos{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#eff6ff;
+  color:var(--primary-blue);
+  font-size:11px;
+  font-weight:800;
+  display:grid;
+  place-items:center;
+  margin-right:12px;
+}
+
+.rank-pos.bottom-pos{
+  background:#fee2e2;
+  color:var(--danger-red);
+}
+
+.rank-info{flex:1;}
+.rank-name{font-size:13px;font-weight:700;color:var(--text-main);}
+.rank-sub{font-size:10px;color:var(--text-sub);margin-top:2px;}
+.rank-metric{text-align:right;}
+.rank-val{font-size:14px;font-weight:800;color:var(--text-main);}
+.rank-pct{font-size:10px;font-weight:700;color:var(--success-green);}
+.rank-pct.low{color:var(--danger-red);}
+
+/* MODERN TABLES */
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  border-radius:12px;
+  border:1px solid #f1f5f9;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+th, td{
+  padding:11px 14px;
+  border-bottom:1px solid #f1f5f9;
+  text-align:right;
+}
+
+th:first-child, td:first-child{
+  text-align:left;
+  position:sticky;
+  left:0;
+  background:#fff;
+  z-index:2;
+  font-weight:700;
+}
+
+th{
+  background:#f8fafc;
+  color:#64748b;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+}
+
+th:first-child{background:#f8fafc;z-index:3;}
+tr:hover td{background:#fcfdfe;}
+
+.btn-cache-reset{
+  background:none;
+  border:1px solid var(--border-color);
+  padding:4px 10px;
+  border-radius:6px;
+  font-size:11px;
+  color:#64748b;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.btn-cache-reset:hover{
+  background:#f1f5f9;
+  color:var(--text-main);
+}
+
+.badge-waiting{
+  font-size:9px;
+  background:#e2e8f0;
+  color:#475569;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-left:4px;
+}
+
+.badge-running{
+  font-size:9px;
+  background:#dbeafe;
+  color:#1e40af;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-left:4px;
+}
+
+.badge-locked{
+  font-size:9px;
+  background:#dcfce7;
+  color:#166534;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-left:4px;
+}
+
+.hour-locked{
+  font-weight:700;
+  color:#0f172a;
+}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(15,23,42,0.6);
+  backdrop-filter:blur(4px);
+  display:none;
+  place-items:center;
+  z-index:1000;
+}
+
+.modal-overlay.open{display:grid;}
+
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:960px;
+  max-height:85vh;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 40px rgba(0,0,0,0.25);
+  overflow:hidden;
+}
+
+.modal-head{
+  padding:18px 24px;
+  background:#f8fafc;
+  border-bottom:1px solid var(--border-color);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-head h3{font-size:16px;font-weight:800;color:var(--text-main);}
+.modal-close{background:none;border:0;font-size:20px;cursor:pointer;color:#64748b;}
+.modal-body{padding:20px 24px;overflow-y:auto;}
+
+.status-badge{
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+.status-completed{background:#dcfce7;color:#15803d;}
+.status-started{background:#e0f2fe;color:#0369a1;}
+.status-assigned{background:#fef3c7;color:#b45309;}
+.status-created{background:#f1f5f9;color:#475569;}
+
+.empty{text-align:center;padding:24px;color:#94a3b8;font-size:12px;}
+.error{display:none;background:#fee2e2;color:#991b1b;padding:14px;border-radius:10px;font-size:12px;margin-bottom:16px;}
+.loading{position:fixed;right:24px;bottom:24px;background:#0f172a;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:600;display:none;z-index:99;box-shadow:0 4px 14px rgba(0,0,0,0.2);}
+.loading.show{display:block;}
+
+@media(max-width:1300px){
+  .kpi-grid{grid-template-columns:repeat(3, 1fr);}
+  .grid-2col, .grid-equal{grid-template-columns:1fr;}
+}
+
+@media(max-width:900px){
+  body{flex-direction:column;}
+  .sidebar{width:100%;height:auto;}
+  .kpi-grid{grid-template-columns:repeat(2, 1fr);}
+  .main-wrapper{height:auto;}
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+    <div class="brand-text">
+      <h2>Warehouse</h2>
+      <span>MANAGEMENT</span>
+    </div>
+  </div>
+
+  <nav class="nav-menu">
+    <a class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+    <a class="nav-item"><i class="fa-solid fa-box"></i> Inventory</a>
+    <a class="nav-item"><i class="fa-solid fa-arrow-down-to-bracket"></i> Inbound</a>
+    <a class="nav-item"><i class="fa-solid fa-truck-fast"></i> Outbound</a>
+  </nav>
+
+  <div class="sidebar-widget">
+    <div class="sidebar-widget-title">Overall Productivity</div>
+    <div class="circular-gauge">
+      <svg>
+        <defs>
+          <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06b6d4" />
+            <stop offset="100%" stop-color="#2563eb" />
+          </linearGradient>
+        </defs>
+        <circle class="gauge-bg" cx="55" cy="55" r="45"></circle>
+        <circle id="gaugeBar" class="gauge-bar" cx="55" cy="55" r="45"></circle>
+      </svg>
+      <div class="gauge-value" id="gaugeValue">0%</div>
+    </div>
+    <div class="gauge-status" id="gaugeStatus">Analyzing output...</div>
+  </div>
+</aside>
+
+<main class="main-wrapper">
+
+  <header class="top-bar">
+    <div class="top-bar-title">
+      <h1>Hyper_Local Dashboard</h1>
+      <p id="connection">Real-time Analytics & Casper Hourly Performance Tracking</p>
+    </div>
+
+    <div class="top-bar-actions">
+      <div class="filter-badge">
+        <i class="fa-regular fa-calendar"></i>
+        <span id="liveDate">Aug 29, 2026</span>
+      </div>
+
+      <div class="filter-badge">
+        <i class="fa-regular fa-clock"></i>
+        <span id="liveTime">--:-- --</span>
+      </div>
+
+      <div style="display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:10px;">
+        <button class="btn-tab active" id="btnDry" onclick="changeType('DRY',this)">DRY</button>
+        <button class="btn-tab" id="btnCold" onclick="changeType('COLD',this)">COLD</button>
+      </div>
+
+      <div class="refresh-badge">
+        <i class="fa-solid fa-rotate"></i>
+        <span id="countdown">06:00</span>
+      </div>
+
+      <button class="btn-refresh" onclick="triggerManualRefresh()">
+        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+      </button>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <div id="error" class="error"></div>
+
+    <div id="activeFilterBar" class="active-filter-bar">
+      <div>
+        <i class="fa-solid fa-filter"></i> Currently Filtered: <span id="activeFilterText">Total TL</span>
+      </div>
+      <button class="btn-clear-filter" onclick="clearCardFilter()">View All Records ✕</button>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" id="card_all" onclick="applyCardFilter('TOTAL_TL', this)">
+        <span class="click-hint">Click 🔍</span>
+        <div class="kpi-header">
+          <div class="kpi-icon blue"><i class="fa-solid fa-dolly"></i></div>
+          <div class="kpi-label">TOTAL PICKABLE</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-val" id="totalLoad">0</div>
+          <div class="kpi-trend up"><i class="fa-solid fa-list-check"></i> <span id="totalLoadsBadge">0 Loads</span></div>
+        </div>
+        <div class="kpi-sub">Click to View Total TLs</div>
+        <svg class="kpi-sparkline"><path d="M0 20 Q 30 5, 60 18 T 120 10 T 180 5" stroke="#3b82f6"/></svg>
+      </div>
+
+      <div class="kpi-card" id="card_picked" onclick="applyCardFilter('STARTED_COMPLETED', this)">
+        <span class="click-hint">Click 🔍</span>
+        <div class="kpi-header">
+          <div class="kpi-icon green"><i class="fa-solid fa-box-open"></i></div>
+          <div class="kpi-label">PICKED QTY</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-val" id="pickedQty">0</div>
+          <div class="kpi-trend up"><i class="fa-solid fa-play"></i> Started/Done</div>
+        </div>
+        <div class="kpi-sub">Click for Started + Completed</div>
+        <svg class="kpi-sparkline"><path d="M0 22 Q 40 20, 80 8 T 140 12 T 200 4" stroke="#10b981"/></svg>
+      </div>
+
+      <div class="kpi-card" id="card_pending" onclick="applyCardFilter('ASSIGNED_CREATED', this)">
+        <span class="click-hint">Click 🔍</span>
+        <div class="kpi-header">
+          <div class="kpi-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="kpi-label">PENDING QTY</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-val" id="pendingQty">0</div>
+          <div class="kpi-trend down"><i class="fa-solid fa-clock"></i> In Queue</div>
+        </div>
+        <div class="kpi-sub">Click for Assigned + Created</div>
+        <svg class="kpi-sparkline"><path d="M0 5 Q 30 18, 70 12 T 130 20 T 190 22" stroke="#f59e0b"/></svg>
+      </div>
+
+      <div class="kpi-card" id="card_completed" onclick="applyCardFilter('COMPLETED_ONLY', this)">
+        <span class="click-hint">Click 🔍</span>
+        <div class="kpi-header">
+          <div class="kpi-icon purple"><i class="fa-solid fa-clipboard-check"></i></div>
+          <div class="kpi-label">COMPLETED LOADS</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-val" id="completedLoad">0</div>
+          <div class="kpi-trend up"><i class="fa-solid fa-check-double"></i> Full TL</div>
+        </div>
+        <div class="kpi-sub">Click for Completed TL Only</div>
+        <svg class="kpi-sparkline"><path d="M0 18 Q 45 6, 90 14 T 150 8 T 200 6" stroke="#8b5cf6"/></svg>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-icon cyan"><i class="fa-solid fa-gauge-high"></i></div>
+          <div class="kpi-label">PICKING PRODUCTIVITY</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-val" id="productivity">0%</div>
+          <div class="kpi-trend up" id="prodTrend"><i class="fa-solid fa-chart-line"></i> Target: 90%</div>
+        </div>
+        <div class="kpi-sub">Picked / Pickable Ratio</div>
+        <svg class="kpi-sparkline"><path d="M0 24 Q 40 16, 80 12 T 140 6 T 200 2" stroke="#06b6d4"/></svg>
+      </div>
+    </div>
+
+    <div class="grid-2col">
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <i class="fa-solid fa-table" style="color:var(--primary-blue)"></i>
+            Hourly Attainment Matrix (<span id="typeDisplayTitle">DRY</span>)
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="auto-target-badge">
+              <i class="fa-solid fa-bullseye"></i>
+              <span id="targetBadgeLabel">Shift Target:</span>
+              <b id="targetBadgeVal">0</b>
+            </div>
+
+            <select id="shiftSelector" onchange="changeShift(this.value)" style="border:1px solid var(--border-color);padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;background:#fff;">
+              <option value="AUTO">Auto Detect Shift</option>
+              <option value="NIGHT">Night Shift (19-06)</option>
+              <option value="DAY">Day Shift (06-18)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="attainment-table-container">
+          <table class="attainment-table">
+            <thead>
+              <tr class="row-overall-night">
+                <th colspan="2" class="cell-overall-title" id="overallShiftTitle">Overall Target</th>
+                <td class="cell-overall-target" id="overallTargetVal">0</td>
+                <td class="cell-overall-actual" id="overallActualVal">0</td>
+                <td class="cell-overall-attain" id="overallAttainVal">0.00%</td>
+              </tr>
+              <tr class="row-subhead">
+                <th colspan="2">Shift / Hours</th>
+                <th>Target</th>
+                <th>Actual</th>
+                <th>Attainment</th>
+              </tr>
+            </thead>
+            <tbody id="attainmentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa-solid fa-list-check" style="color:var(--purple)"></i> TL Status Summary</div>
+          <span class="panel-badge">Current Workload</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Loads</th>
+                <th>Pickable</th>
+                <th>Picked</th>
+                <th>Pending</th>
+              </tr>
+            </thead>
+            <tbody id="statusTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="grid-equal">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa-solid fa-trophy" style="color:#eab308"></i> Top 10 Casper Performance</div>
+          <span class="panel-badge">Best Pickers</span>
+        </div>
+        <div id="topCasper"><div class="empty">Loading leaderboard...</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa-solid fa-arrow-trend-down" style="color:#ef4444"></i> Bottom 10 Casper Performance</div>
+          <span class="panel-badge" style="color:#ef4444;background:#fee2e2">Needs Attention</span>
+        </div>
+        <div id="bottomCasper"><div class="empty">Loading list...</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          <i class="fa-solid fa-table-cells-large" style="color:var(--primary-blue)"></i>
+          Casper-Wise Hourly Output Breakdown
+          <span style="font-size:11px;font-weight:600;color:#64748b;margin-left:8px;">(Live Hourly Sync)</span>
+        </div>
+        <button class="btn-cache-reset" onclick="clearFrozenCache()">
+          <i class="fa-solid fa-rotate-left"></i> Reset Lock Cache
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="hourlyFreezeTable">
+          <thead>
+            <tr id="hourlyFreezeHeader">
+              <th>Casper Name</th>
+              <th>Total Picked</th>
+              <th>Avg Output / Hr</th>
+            </tr>
+          </thead>
+          <tbody id="hourlyFreezeBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="detailModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">TL Drilldown Records</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date / DBD</th>
+              <th>Casper Name</th>
+              <th>Status</th>
+              <th>Pickable</th>
+              <th>Picked</th>
+              <th>Pending</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="modalTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loading" class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Syncing Live Data...</div>
+
+<script>
+const SHEET_ID = "1O9umLXlNwLSfGRpkQ00TxxxUJwEgs0-03C3YY4CaTvQ";
+const GID_MAIN = "0";
+const REFRESH_INTERVAL_SEC = 360;
+
+// NIGHT SHIFT SLOTS (19:00 to 06:00)
+const NIGHT_SHIFT_SLOTS = [
+  { shift: "Night Shift", start: 19, end: 20, label: "19-20 Hrs" },
+  { shift: "Night Shift", start: 20, end: 21, label: "20-21 Hrs" },
+  { shift: "Night Shift", start: 21, end: 22, label: "21-22 Hrs" },
+  { shift: "Night Shift", start: 22, end: 23, label: "22-23 Hrs" },
+  { shift: "Night Shift", start: 23, end: 0,  label: "23-24 Hrs" },
+  { shift: "Night Shift", start: 0,  end: 1,  label: "00-01 Hrs" },
+  { shift: "Night Shift", start: 1,  end: 2,  label: "01-02 Hrs" },
+  { shift: "Night Shift", start: 2,  end: 3,  label: "02-03 Hrs" },
+  { shift: "Night Shift", start: 3,  end: 4,  label: "03-04 Hrs" },
+  { shift: "Night Shift", start: 4,  end: 5,  label: "04-05 Hrs" },
+  { shift: "Night Shift", start: 5,  end: 6,  label: "05-06 Hrs" }
+];
+
+// DAY / MORNING SHIFT SLOTS (06:00 to 18:00)
+const DAY_SHIFT_SLOTS = [
+  { shift: "Day Shift", start: 6,  end: 7,  label: "06-07 Hrs" },
+  { shift: "Day Shift", start: 7,  end: 8,  label: "07-08 Hrs" },
+  { shift: "Day Shift", start: 8,  end: 9,  label: "08-09 Hrs" },
+  { shift: "Day Shift", start: 9,  end: 10, label: "09-10 Hrs" },
+  { shift: "Day Shift", start: 10, end: 11, label: "10-11 Hrs" },
+  { shift: "Day Shift", start: 11, end: 12, label: "11-12 Hrs" },
+  { shift: "Day Shift", start: 12, end: 13, label: "12-13 Hrs" },
+  { shift: "Day Shift", start: 13, end: 14, label: "13-14 Hrs" },
+  { shift: "Day Shift", start: 14, end: 15, label: "14-15 Hrs" },
+  { shift: "Day Shift", start: 15, end: 16, label: "15-16 Hrs" },
+  { shift: "Day Shift", start: 16, end: 17, label: "16-17 Hrs" },
+  { shift: "Day Shift", start: 17, end: 18, label: "17-18 Hrs" }
+];
+
+let DATA = [];
+let CURRENT_TYPE = "DRY";
+let CURRENT_CARD_FILTER = null;
+let SELECTED_SHIFT_MODE = "AUTO";
+let countdownRemaining = REFRESH_INTERVAL_SEC;
+let countdownInterval = null;
+
+let autoDryTarget = 120130;
+let autoColdTarget = 18848;
+
+function updateClock(){
+  const now = new Date();
+  const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+  document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function formatTimer(seconds){
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+
+function updateCountdownDisplay(){
+  const el = document.getElementById("countdown");
+  if(el){
+    el.textContent = formatTimer(countdownRemaining);
+  }
+}
+
+function startCountdownTimer(){
+  if(countdownInterval) clearInterval(countdownInterval);
+  countdownRemaining = REFRESH_INTERVAL_SEC;
+  updateCountdownDisplay();
+
+  countdownInterval = setInterval(() => {
+    countdownRemaining--;
+    if(countdownRemaining <= 0){
+      countdownRemaining = REFRESH_INTERVAL_SEC;
+      loadAllData();
+    }
+    updateCountdownDisplay();
+  }, 1000);
+}
+
+function triggerManualRefresh(){
+  startCountdownTimer();
+  loadAllData();
+}
+
+function clean(value){
+  return String(value ?? "").trim().toUpperCase().replace(/\s+/g, " ");
+}
+
+function statusClean(value){
+  return String(value ?? "").trim().toLowerCase().replace(/[_\-\s]+/g, " ");
+}
+
+function number(value){
+  if(value === null || value === undefined) return 0;
+  let s = String(value).replace(/,/g, "").replace(/"/g, "").trim();
+  if(s === "") return 0;
+  let n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function typeMatch(rowType, selectedType){
+  const a = clean(rowType);
+  const b = clean(selectedType);
+
+  if(b === "COLD"){
+    return a.includes("COLD") || a.includes("CHILL") || a.includes("FROZEN") || a.includes("DAIRY") || a.includes("MEAT");
+  }
+
+  if(b === "DRY"){
+    return a.includes("DRY") || a.includes("AMBIENT") || (!a.includes("COLD") && !a.includes("CHILL") && !a.includes("FROZEN"));
+  }
+
+  return a === b;
+}
+
+// 8 -> 8 (slot 8-9), 9 -> 9 (slot 9-10), 10 -> 10 (slot 10-11)
+function extractHourFromRow(updatedTimeVal, hoursVal, dbdVal){
+  if(hoursVal !== undefined && hoursVal !== null && String(hoursVal).trim() !== ""){
+    let strVal = String(hoursVal).trim();
+    let numMatch = strVal.match(/(\d{1,2})/);
+    if(numMatch){
+      let h = parseInt(numMatch[1], 10);
+      if(!isNaN(h) && h >= 0 && h <= 23) return h;
+    }
+  }
+
+  let parseStr = String(updatedTimeVal || dbdVal || "").trim();
+  if(!parseStr) return null;
+
+  let mGoogle = parseStr.match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),?(\d*)\)/);
+  if(mGoogle){
+    return parseInt(mGoogle[4], 10);
+  }
+
+  let mTime = parseStr.match(/(?:(\d{1,2})\/(\d{1,2})\/(\d{4})|\d{4}-\d{2}-\d{2})?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if(mTime && mTime[4] !== undefined){
+    return parseInt(mTime[4], 10);
+  }
+
+  let d = new Date(parseStr);
+  return isNaN(d.getTime()) ? null : d.getHours();
+}
+
+/* =====================================================
+FETCH AUTOMATIC TARGETS FROM SHEET2
+===================================================== */
+async function fetchSheet2Targets(){
+  const endpoints = [
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Sheet2&tqx=out:json&headers=1&tq=select%20*&cache=${Date.now()}`,
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=1&tqx=out:json&headers=1&tq=select%20*&cache=${Date.now()}`,
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Target&tqx=out:json&headers=1&tq=select%20*&cache=${Date.now()}`
+  ];
+
+  for(let targetUrl of endpoints){
+    try{
+      const response = await fetch(targetUrl, { cache: "no-store" });
+      if(!response.ok) continue;
+
+      const text = await response.text();
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if(start === -1 || end === -1) continue;
+
+      const json = JSON.parse(text.substring(start, end + 1));
+      if(json.status === "error") continue;
+
+      const rows = json.table?.rows || [];
+      const cols = json.table?.cols || [];
+      let found = false;
+
+      cols.forEach((col, idx) => {
+        let label = (col.label || "").toUpperCase();
+        if(label.includes("DRY")){
+          for(let r of rows){
+            let val = number(r.c?.[idx]?.v);
+            if(val > 100){ autoDryTarget = val; found = true; break; }
+          }
+        }
+        if(label.includes("COLD")){
+          for(let r of rows){
+            let val = number(r.c?.[idx]?.v);
+            if(val > 100){ autoColdTarget = val; found = true; break; }
+          }
+        }
+      });
+
+      rows.forEach(r => {
+        const c = r.c || [];
+        for(let i = 0; i < c.length; i++){
+          let cellText = String(c[i]?.v ?? (c[i]?.f ?? "")).trim().toUpperCase();
+          if(cellText.includes("DRY")){
+            for(let j = i + 1; j < c.length; j++){
+              let val = number(c[j]?.v ?? c[j]?.f);
+              if(val > 100){
+                autoDryTarget = val;
+                found = true;
+                break;
+              }
+            }
+          }
+          if(cellText.includes("COLD")){
+            for(let j = i + 1; j < c.length; j++){
+              let val = number(c[j]?.v ?? c[j]?.f);
+              if(val > 100){
+                autoColdTarget = val;
+                found = true;
+                break;
+              }
+            }
+          }
+        }
+      });
+
+      if(found) break;
+    } catch(e){}
+  }
+}
+
+/* =====================================================
+FETCH ALL LIVE DATA
+===================================================== */
+async function loadAllData(){
+  const loading = document.getElementById("loading");
+  const error = document.getElementById("error");
+
+  loading.classList.add("show");
+  error.style.display = "none";
+
+  try{
+    await fetchSheet2Targets();
+
+    const url =
+      "https://docs.google.com/spreadsheets/d/" +
+      SHEET_ID +
+      "/gviz/tq" +
+      "?gid=" + GID_MAIN +
+      "&tqx=out:json" +
+      "&headers=1" +
+      "&tq=" + encodeURIComponent("select *") +
+      "&cache=" + Date.now();
+
+    const response = await fetch(url, { cache: "no-store" });
+    if(!response.ok) throw new Error("Google Sheet HTTP Error " + response.status);
+
+    const text = await response.text();
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+
+    if(start === -1 || end === -1) throw new Error("Google Sheet response invalid");
+
+    const json = JSON.parse(text.substring(start, end + 1));
+    if(json.status === "error"){
+      throw new Error(json.errors?.[0]?.message || "Google Query Error");
+    }
+
+    const rows = json.table?.rows || [];
+
+    function colIndex(letter){
+      let n = 0;
+      for(let i = 0; i < letter.length; i++){
+        n = n * 26 + letter.charCodeAt(i) - 64;
+      }
+      return n - 1;
+    }
+
+    const DBD_COL = colIndex("G");
+    const STATUS_COL = colIndex("K");
+    const CASPER_COL = colIndex("L");
+    const PICKABLE_COL = colIndex("R");
+    const PICKED_COL = colIndex("S");
+    const PENDING_COL = colIndex("T");
+    const TYPE_COL = colIndex("U");
+    const UPDATED_TIME_COL = colIndex("V");
+    const HOURS_COL = colIndex("W");
+
+    DATA = rows.map((row, idx) => {
+      const c = row.c || [];
+      const get = i => c[i]?.v ?? (c[i]?.f ?? "");
+
+      let statusRaw = statusClean(get(STATUS_COL));
+      let pickableQty = number(get(PICKABLE_COL));
+      let pickedQty = number(get(PICKED_COL));
+      let pendingQty = number(get(PENDING_COL));
+
+      if(pickedQty === 0 && pendingQty === 0 && pickableQty > 0){
+        if(statusRaw.includes("complete") || statusRaw.includes("start")){
+          pickedQty = pickableQty;
+        } else if(statusRaw.includes("assign") || statusRaw.includes("creat")){
+          pendingQty = pickableQty;
+        }
+      }
+
+      let rawCasper = String(get(CASPER_COL)).trim() || "Unknown";
+      let casperName = rawCasper;
+
+      if(rawCasper.includes("-")){
+        let parts = rawCasper.split("-");
+        casperName = parts.slice(1).join("-").trim();
+      }
+
+      let rowHour = extractHourFromRow(get(UPDATED_TIME_COL), get(HOURS_COL), get(DBD_COL));
+
+      return {
+        id: idx + 1,
+        dbd: get(DBD_COL),
+        updatedTime: get(UPDATED_TIME_COL),
+        hoursVal: get(HOURS_COL),
+        hour: rowHour,
+        status: statusRaw || "unknown",
+        casper: casperName,
+        rawCasperKey: rawCasper,
+        pickable: pickableQty,
+        picked: pickedQty,
+        pending: pendingQty,
+        type: clean(get(TYPE_COL))
+      };
+    }).filter(row => {
+      return (
+        row.dbd !== "" ||
+        row.pickable !== 0 ||
+        row.picked !== 0 ||
+        row.pending !== 0
+      );
+    });
+
+    document.getElementById("connection").textContent = "🟢 LIVE • " + DATA.length + " Records Connected";
+    render();
+  }
+  catch(e){
+    console.error(e);
+    document.getElementById("connection").textContent = "🔴 Connection Error";
+    error.innerHTML = "<b>Google Sheet data load nahi hua:</b> " + e.message;
+    error.style.display = "block";
+  }
+  finally{
+    loading.classList.remove("show");
+  }
+}
+
+function changeType(type, button){
+  CURRENT_TYPE = clean(type);
+  document.querySelectorAll(".btn-tab").forEach(x => x.classList.remove("active"));
+  button.classList.add("active");
+
+  document.getElementById("typeDisplayTitle").textContent = CURRENT_TYPE;
+
+  const shiftSel = document.getElementById("shiftSelector");
+  if(CURRENT_TYPE === "COLD"){
+    shiftSel.innerHTML = '<option value="DAY">Day Shift (06-18)</option>';
+    SELECTED_SHIFT_MODE = "DAY";
+  } else {
+    shiftSel.innerHTML = `
+      <option value="AUTO">Auto Detect Shift</option>
+      <option value="NIGHT">Night Shift (19-06)</option>
+      <option value="DAY">Day Shift (06-18)</option>
+    `;
+    shiftSel.value = "AUTO";
+    SELECTED_SHIFT_MODE = "AUTO";
+  }
+
+  render();
+}
+
+function changeShift(val){
+  SELECTED_SHIFT_MODE = val;
+  render();
+}
+
+function applyCardFilter(filterType, element){
+  CURRENT_CARD_FILTER = filterType;
+  document.querySelectorAll(".kpi-card").forEach(c => c.classList.remove("selected"));
+  if(element) element.classList.add("selected");
+
+  const filterBar = document.getElementById("activeFilterBar");
+  const filterText = document.getElementById("activeFilterText");
+  filterBar.classList.add("show");
+
+  let label = "Total TL Records";
+  if(filterType === "STARTED_COMPLETED") label = "Started & Completed Pickings";
+  if(filterType === "ASSIGNED_CREATED") label = "Assigned & Created Pendings";
+  if(filterType === "COMPLETED_ONLY") label = "Completed TL Records";
+
+  filterText.textContent = label;
+  render();
+  openModalWithFiltered(label);
+}
+
+function clearCardFilter(){
+  CURRENT_CARD_FILTER = null;
+  document.querySelectorAll(".kpi-card").forEach(c => c.classList.remove("selected"));
+  document.getElementById("activeFilterBar").classList.remove("show");
+  render();
+}
+
+function getFilteredRows(){
+  let rows = DATA.filter(row => typeMatch(row.type, CURRENT_TYPE));
+  if(!CURRENT_CARD_FILTER) return rows;
+
+  if(CURRENT_CARD_FILTER === "STARTED_COMPLETED"){
+    return rows.filter(r => r.status.includes("start") || r.status.includes("complete"));
+  }
+  if(CURRENT_CARD_FILTER === "ASSIGNED_CREATED"){
+    return rows.filter(r => r.status.includes("assign") || r.status.includes("creat"));
+  }
+  if(CURRENT_CARD_FILTER === "COMPLETED_ONLY"){
+    return rows.filter(r => r.status.includes("complete"));
+  }
+  return rows;
+}
+
+function openModalWithFiltered(title){
+  const modal = document.getElementById("detailModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const body = document.getElementById("modalTableBody");
+  const rows = getFilteredRows();
+
+  modalTitle.textContent = `${title} (${rows.length} Records)`;
+
+  if(!rows.length){
+    body.innerHTML = '<tr><td colspan="8" class="empty">No records found for this filter</td></tr>';
+  } else {
+    body.innerHTML = rows.map((r, i) => {
+      let statusClass = "status-created";
+      if(r.status.includes("complete")) statusClass = "status-completed";
+      else if(r.status.includes("start")) statusClass = "status-started";
+      else if(r.status.includes("assign")) statusClass = "status-assigned";
+
+      return `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="font-weight:600">${escapeHTML(r.updatedTime || r.dbd || "-")}</td>
+          <td style="font-weight:700">${escapeHTML(r.casper)}</td>
+          <td><span class="status-badge ${statusClass}">${escapeHTML(r.status)}</span></td>
+          <td>${format(r.pickable)}</td>
+          <td style="font-weight:700;color:var(--primary-blue)">${format(r.picked)}</td>
+          <td style="font-weight:700;color:var(--warning-orange)">${format(r.pending)}</td>
+          <td><b>${escapeHTML(r.type || "-")}</b></td>
+        </tr>
+      `;
+    }).join("");
+  }
+  modal.classList.add("open");
+}
+
+function closeModal(){
+  document.getElementById("detailModal").classList.remove("open");
+}
+
+function format(value){
+  return Math.round(value || 0).toLocaleString("en-IN");
+}
+
+/* =====================================================
+MAIN RENDER
+===================================================== */
+function render(){
+  const baseTypeRows = DATA.filter(row => typeMatch(row.type, CURRENT_TYPE));
+
+  let totalPickable = 0;
+  let totalCompletedLoads = 0;
+  let totalPicked = 0;
+  let totalPending = 0;
+
+  baseTypeRows.forEach(row => {
+    totalPickable += row.pickable;
+    totalPicked += row.picked;
+    totalPending += row.pending;
+    if(row.status.includes("complete")){
+      totalCompletedLoads++;
+    }
+  });
+
+  const productivity = totalPickable > 0 ? (totalPicked / totalPickable) * 100 : 0;
+
+  document.getElementById("totalLoad").textContent = format(totalPickable);
+  document.getElementById("totalLoadsBadge").textContent = `${baseTypeRows.length} Loads`;
+  document.getElementById("completedLoad").textContent = format(totalCompletedLoads);
+  document.getElementById("pickedQty").textContent = format(totalPicked);
+  document.getElementById("pendingQty").textContent = format(totalPending);
+  document.getElementById("productivity").textContent = productivity.toFixed(1) + "%";
+
+  const gaugeBar = document.getElementById("gaugeBar");
+  const gaugeValEl = document.getElementById("gaugeValue");
+  const gaugeStatusEl = document.getElementById("gaugeStatus");
+
+  const offset = 283 - (283 * (Math.min(productivity, 100) / 100));
+  gaugeBar.style.strokeDashoffset = offset;
+  gaugeValEl.textContent = productivity.toFixed(0) + "%";
+
+  if(productivity >= 85){
+    gaugeStatusEl.textContent = "Excellent Output";
+    gaugeStatusEl.style.color = "#34d399";
+  } else if(productivity >= 60){
+    gaugeStatusEl.textContent = "Optimal Performance";
+    gaugeStatusEl.style.color = "#38bdf8";
+  } else {
+    gaugeStatusEl.textContent = "Action Required";
+    gaugeStatusEl.style.color = "#f87171";
+  }
+
+  const displayRows = getFilteredRows();
+
+  renderHourlyAttainmentExactTable(displayRows);
+  renderTopBottomCasper(displayRows);
+  renderHourlyFreezeMatrix(displayRows);
+  renderStatus(displayRows);
+}
+
+/* =====================================================
+HOURLY ATTAINMENT TABLE (DRY 60% DAY / 40% NIGHT FIX)
+===================================================== */
+function renderHourlyAttainmentExactTable(rows){
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  let isNight = false;
+  if(CURRENT_TYPE === "COLD"){
+    isNight = false;
+  } else if(SELECTED_SHIFT_MODE === "AUTO"){
+    isNight = (currentHour >= 19 || currentHour < 6);
+  } else {
+    isNight = (SELECTED_SHIFT_MODE === "NIGHT");
+  }
+
+  const activeSlots = isNight ? NIGHT_SHIFT_SLOTS : DAY_SHIFT_SLOTS;
+  const shiftTitleText = isNight ? `OVERALL NIGHT (${CURRENT_TYPE})` : `OVERALL DAY (${CURRENT_TYPE})`;
+  document.getElementById("overallShiftTitle").textContent = shiftTitleText;
+
+  // DRY Day = 60%, DRY Night = 40% | COLD = 100% Day
+  let shiftTarget = 0;
+  if(CURRENT_TYPE === "DRY"){
+    shiftTarget = isNight ? Math.round(autoDryTarget * 0.40) : Math.round(autoDryTarget * 0.60);
+  } else {
+    shiftTarget = isNight ? 0 : autoColdTarget;
+  }
+
+  document.getElementById("targetBadgeLabel").textContent = `${CURRENT_TYPE} Shift Target:`;
+  document.getElementById("targetBadgeVal").textContent = format(shiftTarget);
+
+  const hourlyStartedCompletedMap = {};
+  rows.forEach(row => {
+    const isStartedOrDone = row.status.includes("start") || row.status.includes("complete");
+    if(isStartedOrDone && row.hour !== null && row.hour !== undefined){
+      if(!hourlyStartedCompletedMap[row.hour]){
+        hourlyStartedCompletedMap[row.hour] = 0;
+      }
+      hourlyStartedCompletedMap[row.hour] += row.picked;
+    }
+  });
+
+  const tbody = document.getElementById("attainmentTableBody");
+  tbody.innerHTML = "";
+
+  const hourlyBase = shiftTarget > 0 ? (shiftTarget / 8) : 0;
+  let overallTargetSum = 0;
+  let overallActualSum = 0;
+
+  const rowsHTML = activeSlots.map(slot => {
+    let slotTarget = 0;
+    let isBlankTarget = false;
+
+    if(isNight){
+      if(slot.label === "04-05 Hrs" || slot.label === "05-06 Hrs"){
+        isBlankTarget = true;
+        slotTarget = 0;
+      } else if(slot.label === "22-23 Hrs" || slot.label === "23-24 Hrs"){
+        slotTarget = Math.round(hourlyBase * 0.5);
+      } else {
+        slotTarget = Math.round(hourlyBase);
+      }
+    } else {
+      if(slot.label === "16-17 Hrs" || slot.label === "17-18 Hrs"){
+        isBlankTarget = true;
+        slotTarget = 0;
+      } else if(slot.label === "06-07 Hrs"){
+        slotTarget = Math.round(hourlyBase * 0.40);
+      } else if(slot.label === "11-12 Hrs" || slot.label === "12-13 Hrs"){
+        slotTarget = Math.round(hourlyBase * 0.50);
+      } else if(slot.label === "15-16 Hrs"){
+        slotTarget = Math.round(hourlyBase * 0.60);
+      } else {
+        slotTarget = Math.round(hourlyBase);
+      }
+    }
+
+    const actual = hourlyStartedCompletedMap[slot.start] || 0;
+    overallTargetSum += slotTarget;
+    overallActualSum += actual;
+
+    let targetDisplay = isBlankTarget ? "-" : format(slotTarget);
+    let attainDisplay = "-";
+    let attainClass = "cell-attain-zero";
+
+    if(!isBlankTarget && slotTarget > 0){
+      const attainment = (actual / slotTarget) * 100;
+      attainDisplay = attainment.toFixed(2) + "%";
+      attainClass = (attainment >= 100) ? "cell-attain-high" : "cell-attain-low";
+    } else if(isBlankTarget && actual > 0){
+      attainDisplay = "100.00%";
+      attainClass = "cell-attain-high";
+    }
+
+    const isCurrentActive = (slot.start === currentHour);
+
+    return `
+      <tr>
+        <td class="cell-shift-tag">${slot.shift}</td>
+        <td class="cell-hour-tag">${slot.label}</td>
+        <td class="cell-target">${targetDisplay}</td>
+        <td class="cell-actual ${isCurrentActive ? 'running' : ''}">${format(actual)}</td>
+        <td class="${attainClass}">${attainDisplay}</td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.innerHTML = rowsHTML;
+
+  const overallAttainment = overallTargetSum > 0 ? (overallActualSum / overallTargetSum) * 100 : 0;
+
+  document.getElementById("overallTargetVal").textContent = format(overallTargetSum);
+  document.getElementById("overallActualVal").textContent = format(overallActualSum);
+  
+  const overallAttainEl = document.getElementById("overallAttainVal");
+  overallAttainEl.textContent = overallAttainment.toFixed(2) + "%";
+  overallAttainEl.className = "cell-overall-attain " + (overallAttainment >= 100 ? "cell-attain-high" : "cell-attain-low");
+}
+
+/* =====================================================
+TOP 10 & BOTTOM 10
+===================================================== */
+function renderTopBottomCasper(rows){
+  const map = {};
+
+  rows.forEach(row => {
+    let key = row.rawCasperKey;
+    if(!map[key]){
+      map[key] = { name: row.casper, pickable: 0, picked: 0, pending: 0, loads: 0 };
+    }
+    map[key].loads++;
+    map[key].pickable += row.pickable;
+    map[key].picked += row.picked;
+    map[key].pending += row.pending;
+  });
+
+  const caspers = Object.values(map).map(x => {
+    x.productivity = x.pickable > 0 ? (x.picked / x.pickable) * 100 : 0;
+    return x;
+  });
+
+  const top = [...caspers].sort((a, b) => b.picked - a.picked).slice(0, 10);
+  const bottom = [...caspers].filter(x => x.picked > 0).sort((a, b) => a.picked - b.picked).slice(0, 10);
+
+  drawRanking("topCasper", top, false);
+  drawRanking("bottomCasper", bottom, true);
+}
+
+function drawRanking(id, list, isBottom){
+  const box = document.getElementById(id);
+  if(!list.length){
+    box.innerHTML = '<div class="empty">No data available</div>';
+    return;
+  }
+
+  box.innerHTML = list.map((x, i) => `
+    <div class="rank-item">
+      <div class="rank-pos ${isBottom ? 'bottom-pos' : ''}">${i + 1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${escapeHTML(x.name)}</div>
+        <div class="rank-sub">${format(x.loads)} Loads • ${format(x.pickable)} Pickable</div>
+      </div>
+      <div class="rank-metric">
+        <div class="rank-val">${format(x.picked)}</div>
+        <div class="rank-pct ${isBottom ? 'low' : ''}">${x.productivity.toFixed(1)}%</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* =====================================================
+CASPER HOURLY MATRIX
+===================================================== */
+function renderHourlyFreezeMatrix(rows){
+  const headerRow = document.getElementById("hourlyFreezeHeader");
+  const body = document.getElementById("hourlyFreezeBody");
+
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  const casperHourlyMap = {};
+
+  rows.forEach(row => {
+    const isStartedOrDone = row.status.includes("start") || row.status.includes("complete");
+    if(isStartedOrDone && row.hour !== null && row.hour !== undefined){
+      let key = row.rawCasperKey;
+      if(!casperHourlyMap[key]){
+        casperHourlyMap[key] = {
+          name: row.casper,
+          slots: {}
+        };
+      }
+      if(!casperHourlyMap[key].slots[row.hour]){
+        casperHourlyMap[key].slots[row.hour] = 0;
+      }
+      casperHourlyMap[key].slots[row.hour] += row.picked;
+    }
+  });
+
+  const isNight = (CURRENT_TYPE !== "COLD") && (SELECTED_SHIFT_MODE === "NIGHT" || (SELECTED_SHIFT_MODE === "AUTO" && (now.getHours() >= 19 || now.getHours() < 6)));
+  const activeSlots = isNight ? NIGHT_SHIFT_SLOTS : DAY_SHIFT_SLOTS;
+
+  let headerHTML = `
+    <th>Casper Name</th>
+    <th>Total Picked</th>
+    <th>Avg Output / Hr</th>
+  `;
+
+  activeSlots.forEach(slot => {
+    const isRunning = (slot.start === currentHour);
+    const isPast = isNight ? (slot.start > currentHour && currentHour < 12) : (slot.start < currentHour);
+
+    let badge = `<span class="badge-waiting">WAITING</span>`;
+    if(isPast) badge = `<span class="badge-locked">🔒 LOCKED</span>`;
+    else if(isRunning) badge = `<span class="badge-running">⏱️ LIVE</span>`;
+
+    headerHTML += `
+      <th style="text-align:center">
+        ${slot.label}
+        ${badge}
+      </th>
+    `;
+  });
+
+  headerRow.innerHTML = headerHTML;
+
+  const allCasperKeys = Object.keys(casperHourlyMap);
+
+  if(!allCasperKeys.length){
+    body.innerHTML = '<tr><td colspan="25" class="empty">No Casper records</td></tr>';
+    return;
+  }
+
+  const list = allCasperKeys.map(key => {
+    let name = casperHourlyMap[key]?.name || key;
+    let totalPicked = 0;
+    let activeSlotsCount = 0;
+    let slotValues = {};
+
+    activeSlots.forEach(slot => {
+      let val = casperHourlyMap[key]?.slots[slot.start] || 0;
+      slotValues[slot.label] = val;
+      totalPicked += val;
+      if(val > 0) activeSlotsCount++;
+    });
+
+    const avgPerHour = activeSlotsCount > 0 ? (totalPicked / activeSlotsCount).toFixed(0) : "0";
+
+    return {
+      name: name,
+      totalPicked: totalPicked,
+      avgPerHour: avgPerHour,
+      slotValues: slotValues
+    };
+  });
+
+  list.sort((a, b) => b.totalPicked - a.totalPicked);
+
+  body.innerHTML = list.map(c => {
+    let slotCells = activeSlots.map(slot => {
+      let val = c.slotValues[slot.label];
+      if(!val || val === 0){
+        return '<td style="color:#cbd5e1;text-align:center">-</td>';
+      }
+      return `<td class="hour-locked" style="text-align:center">${format(val)}</td>`;
+    }).join("");
+
+    return `
+      <tr>
+        <td style="font-weight:700">${escapeHTML(c.name)}</td>
+        <td style="font-weight:800;color:var(--primary-blue)">${format(c.totalPicked)}</td>
+        <td style="font-weight:800;color:var(--success-green)">${format(c.avgPerHour)} / hr</td>
+        ${slotCells}
+      </tr>
+    `;
+  }).join("");
+}
+
+/* =====================================================
+STATUS TABLE
+===================================================== */
+function renderStatus(rows){
+  const map = {};
+
+  rows.forEach(row => {
+    let s = row.status || "unknown";
+    if(!map[s]){
+      map[s] = { loads: 0, pickable: 0, picked: 0, pending: 0 };
+    }
+    map[s].loads++;
+    map[s].pickable += row.pickable;
+    map[s].picked += row.picked;
+    map[s].pending += row.pending;
+  });
+
+  const order = ["completed", "started", "assigned", "created"];
+  const statuses = Object.keys(map).sort((a, b) => {
+    let x = order.findIndex(k => a.includes(k));
+    let y = order.findIndex(k => b.includes(k));
+    if(x < 0) x = 999;
+    if(y < 0) y = 999;
+    return x - y;
+  });
+
+  document.getElementById("statusTable").innerHTML = statuses.map(s => {
+    let x = map[s];
+    return `
+      <tr>
+        <td style="font-weight:700">${escapeHTML(s.toUpperCase())}</td>
+        <td>${format(x.loads)}</td>
+        <td>${format(x.pickable)}</td>
+        <td style="color:var(--primary-blue);font-weight:700">${format(x.picked)}</td>
+        <td style="color:var(--warning-orange);font-weight:700">${format(x.pending)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function escapeHTML(value){
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+loadAllData();
+startCountdownTimer();
+</script>
+
+</body>
+</html>
