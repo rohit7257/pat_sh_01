@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Warehouse Dashboard - Picking Productivity</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,13 +27,17 @@
 
 *{box-sizing:border-box;margin:0;padding:0;}
 
+html, body{
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body{
   font-family:'Plus Jakarta Sans', sans-serif;
   background:var(--body-bg);
   color:var(--text-main);
   display:flex;
   min-height:100vh;
-  overflow-x:hidden;
 }
 
 /* SIDEBAR */
@@ -63,6 +67,7 @@ body{
   display:grid;
   place-items:center;
   font-size:18px;
+  flex-shrink:0;
 }
 
 .brand-text h2{
@@ -185,8 +190,10 @@ body{
   display:flex;
   flex-direction:column;
   min-width:0;
+  max-width:100%;
   height:100vh;
   overflow-y:auto;
+  overflow-x:hidden;
 }
 
 .top-bar{
@@ -200,19 +207,25 @@ body{
   top:0;
   z-index:10;
   gap:16px;
-  flex-wrap:wrap;
+  width:100%;
+}
+
+.top-bar-title{
+  min-width:0;
 }
 
 .top-bar-title h1{
   font-size:20px;
   font-weight:800;
   color:var(--text-main);
+  word-break:break-word;
 }
 
 .top-bar-title p{
   font-size:12px;
   color:var(--text-sub);
   margin-top:2px;
+  word-break:break-word;
 }
 
 .top-bar-actions{
@@ -291,6 +304,8 @@ body{
   display:flex;
   flex-direction:column;
   gap:20px;
+  width:100%;
+  max-width:100%;
 }
 
 /* TOP KPI CARDS */
@@ -298,6 +313,7 @@ body{
   display:grid;
   grid-template-columns:repeat(5, 1fr);
   gap:16px;
+  width:100%;
 }
 
 .kpi-card{
@@ -313,6 +329,7 @@ body{
   cursor:pointer;
   transition:all 0.25s ease;
   user-select:none;
+  min-width:0;
 }
 
 .kpi-card:hover{
@@ -353,6 +370,7 @@ body{
   place-items:center;
   font-size:16px;
   color:#fff;
+  flex-shrink:0;
 }
 
 .kpi-icon.blue{background:linear-gradient(135deg, #3b82f6, #1d4ed8)}
@@ -365,6 +383,9 @@ body{
   font-size:12px;
   font-weight:700;
   color:var(--text-sub);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .kpi-body{
@@ -372,6 +393,8 @@ body{
   display:flex;
   align-items:baseline;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:4px;
 }
 
 .kpi-val{
@@ -423,7 +446,7 @@ body{
   font-weight:700;
   color:#1e40af;
   gap:10px;
-  flex-wrap:wrap;
+  width:100%;
 }
 
 .active-filter-bar.show{
@@ -438,6 +461,7 @@ body{
   border-radius:6px;
   cursor:pointer;
   font-weight:700;
+  flex-shrink:0;
 }
 
 /* 2-COLUMN GRID */
@@ -445,12 +469,14 @@ body{
   display:grid;
   grid-template-columns:1.25fr 1fr;
   gap:16px;
+  width:100%;
 }
 
 .grid-equal{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
+  width:100%;
 }
 
 .panel{
@@ -459,6 +485,8 @@ body{
   border-radius:16px;
   padding:20px;
   box-shadow:0 2px 6px rgba(0,0,0,0.02);
+  min-width:0;
+  width:100%;
 }
 
 .panel-head{
@@ -505,8 +533,10 @@ body{
 /* ATTAINMENT TABLE */
 .attainment-table-container{
   width:100%;
+  max-width:100%;
   border-radius:6px;
   overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
   border:1.5px solid #000;
   box-shadow:0 4px 12px rgba(0,0,0,0.05);
 }
@@ -517,7 +547,7 @@ body{
   font-family:'Plus Jakarta Sans', Arial, sans-serif;
   font-size:13px;
   text-align:center;
-  min-width:400px;
+  min-width:380px;
 }
 
 .attainment-table th, 
@@ -607,6 +637,7 @@ body{
   border-bottom:1px solid #f1f5f9;
   transition:background 0.2s;
   border-radius:8px;
+  gap:10px;
 }
 
 .rank-item:hover{background:#f8fafc;}
@@ -622,7 +653,6 @@ body{
   font-weight:800;
   display:grid;
   place-items:center;
-  margin-right:12px;
   flex-shrink:0;
 }
 
@@ -662,7 +692,9 @@ body{
 /* MODERN TABLES */
 .table-wrap{
   width:100%;
+  max-width:100%;
   overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
   border-radius:12px;
   border:1px solid #f1f5f9;
 }
@@ -761,13 +793,14 @@ tr:hover td{background:#fcfdfe;}
   display:none;
   place-items:center;
   z-index:1000;
+  padding:12px;
 }
 
 .modal-overlay.open{display:grid;}
 
 .modal-box{
   background:#fff;
-  width:90%;
+  width:100%;
   max-width:960px;
   max-height:85vh;
   border-radius:18px;
@@ -784,11 +817,29 @@ tr:hover td{background:#fcfdfe;}
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
 }
 
-.modal-head h3{font-size:16px;font-weight:800;color:var(--text-main);}
-.modal-close{background:none;border:0;font-size:20px;cursor:pointer;color:#64748b;}
-.modal-body{padding:20px 24px;overflow-y:auto;}
+.modal-head h3{
+  font-size:16px;
+  font-weight:800;
+  color:var(--text-main);
+  word-break:break-word;
+}
+
+.modal-close{
+  background:none;
+  border:0;
+  font-size:20px;
+  cursor:pointer;
+  color:#64748b;
+  flex-shrink:0;
+}
+
+.modal-body{
+  padding:20px 24px;
+  overflow-y:auto;
+}
 
 .status-badge{
   padding:3px 8px;
@@ -808,18 +859,17 @@ tr:hover td{background:#fcfdfe;}
 .loading{position:fixed;right:24px;bottom:24px;background:#0f172a;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:600;display:none;z-index:99;box-shadow:0 4px 14px rgba(0,0,0,0.2);}
 .loading.show{display:block;}
 
-/* RESPONSIVENESS ENHANCEMENTS */
-@media(max-width:1400px){
+/* RESPONSIVE & MOBILE OVERFLOW FIXES */
+@media(max-width:1300px){
   .kpi-grid{grid-template-columns:repeat(3, 1fr);}
-}
-
-@media(max-width:1100px){
-  .kpi-grid{grid-template-columns:repeat(2, 1fr);}
   .grid-2col, .grid-equal{grid-template-columns:1fr;}
 }
 
 @media(max-width:900px){
-  body{flex-direction:column;}
+  body{
+    flex-direction:column;
+    width:100%;
+  }
   .sidebar{
     width:100%;
     height:auto;
@@ -837,20 +887,30 @@ tr:hover td{background:#fcfdfe;}
     font-size:12px;
   }
   .sidebar-widget{display:none;}
-  .main-wrapper{height:auto;overflow-y:visible;}
+  .main-wrapper{
+    height:auto;
+    overflow-y:visible;
+    width:100%;
+  }
   .top-bar{
     padding:14px 16px;
     flex-direction:column;
     align-items:flex-start;
-    gap:12px;
   }
   .top-bar-actions{
     width:100%;
     justify-content:flex-start;
     gap:8px;
   }
-  .content-area{padding:16px;}
-  .panel{padding:14px;}
+  .content-area{
+    padding:16px 12px;
+    gap:16px;
+  }
+  .kpi-grid{grid-template-columns:repeat(2, 1fr);}
+  .panel{
+    padding:14px 12px;
+    border-radius:12px;
+  }
   .panel-head{
     flex-direction:column;
     align-items:flex-start;
@@ -863,10 +923,13 @@ tr:hover td{background:#fcfdfe;}
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:8px;
+    width:100%;
   }
   .filter-badge, .refresh-badge, .btn-refresh{
     justify-content:center;
     width:100%;
+    padding:8px 6px;
+    font-size:11px;
   }
   .top-bar-actions > div[style*="display:flex"]{
     grid-column:span 2;
@@ -877,8 +940,17 @@ tr:hover td{background:#fcfdfe;}
     flex:1;
     text-align:center;
   }
-  .modal-box{width:95%;max-height:90vh;}
-  .modal-head, .modal-body{padding:14px;}
+  .active-filter-bar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .btn-clear-filter{
+    width:100%;
+    text-align:center;
+  }
+  .modal-head, .modal-body{
+    padding:14px 12px;
+  }
 }
 </style>
 </head>
@@ -1714,7 +1786,6 @@ function renderHourlyAttainmentExactTable(rows){
   const shiftTitleText = isNight ? `OVERALL NIGHT (${CURRENT_TYPE})` : `OVERALL DAY (${CURRENT_TYPE})`;
   document.getElementById("overallShiftTitle").textContent = shiftTitleText;
 
-  // DRY Day = 60%, DRY Night = 40% | COLD = 100% Day
   let shiftTarget = 0;
   if(CURRENT_TYPE === "DRY"){
     shiftTarget = isNight ? Math.round(autoDryTarget * 0.40) : Math.round(autoDryTarget * 0.60);
